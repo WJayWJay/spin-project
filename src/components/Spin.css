@@ -1,0 +1,127 @@
+
+.container {
+    margin-top: 20px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-align {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.flex-column {
+    flex-direction: column;
+}
+
+.spin-container {
+    background-color: #000;
+    padding: 10px;
+}
+
+.spin {
+    border-radius: 100%;
+    width: 300px;
+    height: 300px;
+    /* background-color: pink; */
+    position: relative;
+}
+.spin-pointer {
+    position: absolute;
+    height: calc(50%);
+    width: 10px;
+    left: 50%;
+    transform: translate(-50%)
+}
+.real-pointer {
+    position: absolute;
+    bottom: 0;
+    background: #4f4ff3;
+    width: 100%;
+    height: calc(100% - 6px);
+    border-radius: 100% 100% 0 0;
+
+    transform-origin: bottom;
+    /* transform: rotateZ(45deg); */
+    transition: all 1s;
+
+    /* animation: rotate 2s ease-out infinite; */
+}
+.real-pointer:after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 18px;
+    background: #4f4ff3;
+    bottom: -8px;
+    left: 0;
+}
+
+@keyframes rotate{
+    0% { transform: rotateZ(0deg);}
+    50% { transform: rotateZ(180deg);}
+    100% { transform: rotateZ(360deg);}
+}
+
+
+
+.spin-center {
+    z-index: 10;
+    border-radius: 6px;
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+
+.dot-container {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: calc(50%);
+}
+.dot-container .dot {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotateZ(10deg)
+}
+.dot-container .dot .dot-content {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    /* transform: translate(-50%, -50%); */
+    top: -2px;
+    left: -2px;
+    transition: all 1s;
+
+}
+.dot-container .big-dot::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    transform: translate(-50%, -50%);
+    
+    cursor: pointer;
+    transition: all 1s;
+
+}
+
+.dot-container .highlight-dot .dot-content {
+    background-color: rgba(255, 255, 255, 1) !important;
+}
+.dot-container .highlight-dot::before {
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+}
