@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && rm -rf ./gh-pages/* && cp -R ./build/* ./gh-pages",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
