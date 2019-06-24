@@ -1,6 +1,6 @@
 
 const now = () => performance ? performance.now() : Date.now()
-export function throttle(fn, timeout = 1000) {
+export function throttle(fn, timeout = 1000, only = true) {
 
     var cur = now();
     var id;
@@ -11,7 +11,7 @@ export function throttle(fn, timeout = 1000) {
         if (id) {
             clearTimeout(id);
         }
-        if ((n - cur) > timeout) {
+        if ((n - cur) > timeout && !only) {
             fn && fn.apply(null, args);
             cur = now();
         } else {
@@ -23,3 +23,4 @@ export function throttle(fn, timeout = 1000) {
         }
     }
 }
+

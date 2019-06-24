@@ -4,6 +4,7 @@ import './Spin.css';
 
 import classnames from 'classnames';
 import { throttle } from '../util/util';
+import { animation, increaseFn } from '../util/animation';
 
 class Main extends React.Component {
     state = {
@@ -27,64 +28,92 @@ class Main extends React.Component {
 
         const baseDeg = (360 / pointers.length);
 
+        
+        const deg = Math.abs(baseDeg * (index));
+        this.pointer.style = `transform: rotateZ(${deg}deg)`;
+
+        
+
         this.raf(() => {
-            const deg = Math.abs(baseDeg * (index));
-            this.pointer.style = `transform: rotateZ(${deg}deg)`;
+            var all = this.dotInst.querySelectorAll('.dot-content');
+            var i = current+ 1;
+            const aType = this.state.type;
 
-            this.raf(() => {
-                var all = this.dotInst.querySelectorAll('.dot-content');
-                var i = current+ 1;
+            var dura = Math.abs(1000 / ((index - current) / 9))
+            var reverse = current > index;
+            console.log('--------', current, index, reverse)
+
+            if (reverse) {
+                runReverse(all, current - 1, index, dura);
+            } else {
+                run(all, i, index, dura);
+            }
+
+            function runReverse(arr, start, end, duration) {
+                var k = 8;
+                var i = start;
+
+                if (start > end) {
+                    while (k > 0) {
+                        (0, (i, k) => 
+                        {
+                            var from = 1 + increaseFn(k, aType);
+                            var to = 1;
+
+                            animation(from, to, duration, (v, isEnd) => {
+                                arr[i].style= `transform: scale(${v})`;
+                                if (isEnd && k === 1) {
+                                    runReverse(arr, start - 9, end, duration);
+                                }
+                            }, (start, from , range, dura) => {
+                                return from - range * start / dura ;
+                            })
+                        })(i, k);
+                        i--;
+                        k--;
+                    }
+                }
+            }
+
+
+            function run(arr, start, end, duration) {
                 var k = 1;
+                var i = start;
+                if (start < end) {
+                    while (k < 9) {
 
-                while(i < index) {
-                    if (i % 9 === 0) {
-                        k = 1;
-                    } else {
-                        const animationType = this.state.type;
-                        this.setStyle(all, i, k, animationType)
+                        (0, (i, k) => 
+                        {
+                            var to = 1 + increaseFn(k, aType);
+                            var from = 1;
+
+                            if (reverse) {
+                                var tmp = from;
+                                from = to;
+                                to = tmp;
+
+                                console.log(from, to);
+                            }
+
+                            animation(from, to, duration, (v, isEnd) => {
+                                arr[i].style= `transform: scale(${v})`;
+                                if (isEnd && k === 8) {
+                                    run(arr, start + 9, end, duration);
+                                }
+                            })
+                        })(i, k);
+                        i++;
                         k++;
                     }
-                    i++;
                 }
+            }
 
-                setTimeout(() => {
-                    this.raf(() => {
-                        i = current+ 1;
-                        while(i < index) {
-                            all[i].style= `transform: scale(1)`;
-                            i++;
-                        }
-                    });
-                }, 500)
-            })
         })
 
         this.setState({current: index});
     }
-    setStyle = (all, i, k, type = 'ease-in-out') => {
-        
-        this.raf(() =>{
-            var s = 1;
-            switch(type) {
-                case 'ease-in-out':
-                    s = 1 + g(k, 4);
-                    break;
-                case 'ease-in':
-                    s = 1 + k * 0.2;
-                    break;
-                default: 
-                    s = 1;
-            }
-            all[i].style= `transform: scale(${s})`;
-        });
 
-        function g(index, base = 2) {
-            var P = Math.PI;
-            var ap = P / 8;
-            var d = Math.cos(ap * index - P/2) * base;
-            return d;
-        }
-    }
+    
 
     raf = (fn) => fn && window.requestAnimationFrame(fn);
 
@@ -106,7 +135,8 @@ class Main extends React.Component {
 
     mouseWheel = (e) => {
         const {current} = this.state;
-        const dy = e && e.nativeEvent && e.nativeEvent.deltaY;
+        // const dy = e && e.nativeEvent && e.nativeEvent.deltaY;
+        const dy = e;
         if (dy) {
             let index = current;
             if (dy < 0) {
@@ -129,9 +159,30 @@ class Main extends React.Component {
         })
     }
 
+    toRem = (val) => {
+        var html = document.firstElementChild;
+        var size = val + 'px';
+        var w = window.innerWidth || window.outerWidth;
+        if (html && html.tagName === 'HTML' && window.getComputedStyle) {
+            var htmlStyle = window.getComputedStyle(html);
+            var fs = parseFloat(htmlStyle.fontSize);
+            if (val > w) val = w - 20;
+            size = val / fs + 'rem';
+            
+        }
+        return size;
+    }
+
+    componentDidMount() {
+        this.wheel = throttle(this.mouseWheel, 50);
+    }
+
     render() {
         const {pointers, size, current} = this.state;
         const baseDeg = (360 / pointers.length);
+
+        var rsize = this.toRem(size);
+
         return (
             <div className="container">
                 <span>size: </span><input key={'input'} placeholder={size} onChange={this.change} />
@@ -141,8 +192,11 @@ class Main extends React.Component {
                 </select>
                 <div key={'spin'} style={{marginTop: 20}} className="flex flex-align spin-container">
                     <div
-                        onWheel={throttle(this.mouseWheel, 800)}
-                        style={{height: size, width: size}} 
+                        onWheel={(e) => {
+                            var dy = e && e.nativeEvent && e.nativeEvent.deltaY;
+                            this.wheel(dy)
+                        }}
+                        style={{height: rsize, width: rsize}} 
                         className="spin">
                         <div key={1} className="spin-center"></div>
                         <div key={2} className="spin-pointer">

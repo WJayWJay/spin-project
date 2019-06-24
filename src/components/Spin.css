@@ -18,7 +18,7 @@
 
 .spin-container {
     background-color: #000;
-    padding: 10px;
+    padding: 10px 0;
 }
 
 .spin {
@@ -102,7 +102,7 @@
     /* transform: translate(-50%, -50%); */
     top: -2px;
     left: -2px;
-    transition: all 1s;
+    /* transition: all 1s; */
 
 }
 .dot-container .big-dot::before {
