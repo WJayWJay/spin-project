@@ -32,7 +32,7 @@ export function animation (
     var to = options.to;
 
 
-    const fnGetValue = (start, from , range, dura) => {
+    const getProgress = (start, from , range, dura) => {
         if (calVal) {
             return calVal(start, from , range, dura);
         }
@@ -40,7 +40,7 @@ export function animation (
     };
 
     const tick = function() {
-        var value = fnGetValue(start, from, to - from, during);
+        var value = getProgress(start, from, to - from, during);
         start++;
         if (start <= during) {
             options.callback(value);

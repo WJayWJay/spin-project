@@ -156,7 +156,7 @@ class Main extends React.Component {
         if (html && html.tagName === 'HTML' && window.getComputedStyle) {
             var htmlStyle = window.getComputedStyle(html);
             var fs = parseFloat(htmlStyle.fontSize);
-            if (val > w) val = w - 20;
+            if (val > w - 20) val = w - 20;
             size = val / fs + 'rem';
             
         }
