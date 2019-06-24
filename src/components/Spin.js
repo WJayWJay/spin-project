@@ -33,82 +33,72 @@ class Main extends React.Component {
         this.pointer.style = `transform: rotateZ(${deg}deg)`;
 
         
+        var all = this.dotInst.querySelectorAll('.dot-content');
+        var i = current+ 1;
+        const aType = this.state.type;
 
-        this.raf(() => {
-            var all = this.dotInst.querySelectorAll('.dot-content');
-            var i = current+ 1;
-            const aType = this.state.type;
+        var dura = Math.abs(1000 / ((index - current) / 9))
+        var reverse = current > index;
+        console.log('--------', current, index, reverse)
 
-            var dura = Math.abs(1000 / ((index - current) / 9))
-            var reverse = current > index;
-            console.log('--------', current, index, reverse)
+        if (reverse) {
+            runReverse(all, current - 1, index, dura);
+        } else {
+            run(all, i, index, dura);
+        }
 
-            if (reverse) {
-                runReverse(all, current - 1, index, dura);
-            } else {
-                run(all, i, index, dura);
-            }
+        function runReverse(arr, start, end, duration) {
+            var k = 8;
+            var i = start;
 
-            function runReverse(arr, start, end, duration) {
-                var k = 8;
-                var i = start;
-
-                if (start > end) {
-                    while (k > 0) {
-                        (0, (i, k) => 
-                        {
-                            var from = 1 + increaseFn(k, aType);
-                            var to = 1;
-
-                            animation(from, to, duration, (v, isEnd) => {
+            if (start > end) {
+                while (k > 0) {
+                    (0, (i, k) => 
+                    {
+                        var from = 1 + increaseFn(k, aType);
+                        var to = 1;
+                        animation({
+                            from, to, duration, 
+                            callback: (v, isEnd) => {
                                 arr[i].style= `transform: scale(${v})`;
                                 if (isEnd && k === 1) {
                                     runReverse(arr, start - 9, end, duration);
                                 }
-                            }, (start, from , range, dura) => {
-                                return from - range * start / dura ;
-                            })
-                        })(i, k);
-                        i--;
-                        k--;
-                    }
+                            }
+                        });
+                    })(i, k);
+                    i--;
+                    k--;
                 }
             }
+        }
 
 
-            function run(arr, start, end, duration) {
-                var k = 1;
-                var i = start;
-                if (start < end) {
-                    while (k < 9) {
+        function run(arr, start, end, duration) {
+            var k = 1;
+            var i = start;
+            if (start < end) {
+                while (k < 9) {
+                    (0, (i, k) => 
+                    {
+                        var to = 1 + increaseFn(k, aType);
+                        var from = 1;
 
-                        (0, (i, k) => 
-                        {
-                            var to = 1 + increaseFn(k, aType);
-                            var from = 1;
-
-                            if (reverse) {
-                                var tmp = from;
-                                from = to;
-                                to = tmp;
-
-                                console.log(from, to);
-                            }
-
-                            animation(from, to, duration, (v, isEnd) => {
+                        animation({
+                            from, to, duration, 
+                            callback: (v, isEnd) => {
                                 arr[i].style= `transform: scale(${v})`;
                                 if (isEnd && k === 8) {
                                     run(arr, start + 9, end, duration);
                                 }
-                            })
-                        })(i, k);
-                        i++;
-                        k++;
-                    }
+                            }
+                        })
+                    })(i, k);
+                    i++;
+                    k++;
                 }
             }
-
-        })
+        }
 
         this.setState({current: index});
     }

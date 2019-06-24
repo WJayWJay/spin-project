@@ -4,19 +4,33 @@ function defaltCal(start, from , range, dura) {
     return range * start / dura + from;
 }
 
-export function animation (from, to, duration, callback, calVal = defaltCal) {
-
+/**
+ * {from, to, duration, callback, calVal: defaltCal}
+ * @param {number} option.from
+ * @param {number} option.to
+ * @param {number} option.duration
+ * @param {Function} option.callback
+ * @param {Function} option.calVal
+ */
+export function animation (
+    option
+) {
+    
     var options = Object.assign({
         duration: 300,
         easing: 'Linear',
+        calVal: defaltCal,
         callback: function() {}
-    }, {
-        duration, callback
-    });
-
+    }, option || {});
+    
+    var calVal = options.calVal;
     var start = 0;
     var req = null;
     var during = Math.ceil(options.duration / 17);
+
+    var from = options.from;
+    var to = options.to;
+
 
     const fnGetValue = (start, from , range, dura) => {
         if (calVal) {
@@ -26,7 +40,7 @@ export function animation (from, to, duration, callback, calVal = defaltCal) {
     };
 
     const tick = function() {
-        var value = fnGetValue(start, from, Math.abs(to - from), during);
+        var value = fnGetValue(start, from, to - from, during);
         start++;
         if (start <= during) {
             options.callback(value);
@@ -35,10 +49,20 @@ export function animation (from, to, duration, callback, calVal = defaltCal) {
             options.callback(to, true);
         }
     }
+    const cancelRaf = () => {
+        window.cancelAnimationFrame(req);
+    }
+    const resume = () => {
+        tick();
+    }
 
     tick();
 
-    return () => req;
+    return () => ({
+        req,
+        cancelRaf,
+        resume
+    });
 }
 
 
